@@ -55,7 +55,7 @@ const cracoConfig = (module.exports = {
       webpackConfig.module.rules.push({
         test: /\.mjs$/,
         include: /node_modules/,
-        type: 'javascript/auto',
+        type: 'javascript/esm',
         resolve: {
           fullySpecified: false
         },

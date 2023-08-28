@@ -1,13 +1,12 @@
 import { Classes } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
-import { Canvas, useFrame } from '@react-three/fiber';
 import { Ace, Range } from 'ace-builds';
 import { FSModule } from 'browserfs/dist/node/core/FS';
 import classNames from 'classnames';
 import { Chapter, Variant } from 'js-slang/dist/types';
 import { isEqual } from 'lodash';
 import { decompressFromEncodedURIComponent } from 'lz-string';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { HotKeys } from 'react-hotkeys';
 import {  useDispatch, useStore } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router';
@@ -128,6 +127,7 @@ import {
   SelectionRange
 } from '../../features/sourceRecorder/SourceRecorderTypes';
 import { WORKSPACE_BASE_PATHS } from '../fileSystem/createInBrowserFileSystem';
+import RapierCanvas from './Canvas';
 import {
   dataVisualizerTab,
   desktopOnlyTabIds,
@@ -1071,9 +1071,7 @@ const Playground: React.FC<PlaygroundProps> = props => {
       <Workspace {...workspaceProps} />
       <div id="RobotSimulation">
         <div className="canvasWrapper">
-          <Canvas>
-          <Box position={[1.2, 0, 0]} />
-          </Canvas>
+          <RapierCanvas/>
         </div>
         <div className="greyedOutBackground"></div>
       </div>
@@ -1081,28 +1079,6 @@ const Playground: React.FC<PlaygroundProps> = props => {
   );
 };
 
-function Box(props:any) {
-  // This reference will give us direct access to the mesh
-  const mesh = useRef<any>(null)
-  // Set up state for the hovered and active state
-  const [hovered, setHover] = useState(false)
-  const [active, setActive] = useState(false)
-  // Rotate mesh every frame, this is outside of React without overhead
-  useFrame(() => (mesh.current.rotation.x += 0.01))
-
-  return (
-    <mesh
-      {...props}
-      ref={mesh}
-      scale={active ? 1.5 : 1}
-      onClick={(event) => setActive(!active)}
-      onPointerOver={(event) => setHover(true)}
-      onPointerOut={(event) => setHover(false)}>
-      <boxGeometry args={[1, 2, 3]} />
-      <meshStandardMaterial color={hovered ? 'hotpink' : 'orange'} />
-    </mesh>
-  )
-}
 
 // react-router lazy loading
 // https://reactrouter.com/en/main/route/lazy
