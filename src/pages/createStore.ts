@@ -1,5 +1,5 @@
+import { configureStore,  } from '@reduxjs/toolkit';
 import { throttle } from 'lodash';
-import { applyMiddleware, compose, createStore as _createStore } from 'redux';
 import createSagaMiddleware from 'redux-saga';
 
 import { defaultState } from '../commons/application/ApplicationTypes';
@@ -8,33 +8,34 @@ import MainSaga from '../commons/sagas/MainSaga';
 import { generateOctokitInstance } from '../commons/utils/GitHubPersistenceHelper';
 import { loadStoredState, SavedState, saveState } from './localStorage';
 
+
 export const store = createStore();
 
 export function createStore() {
   const sagaMiddleware = createSagaMiddleware();
-  const middleware = [sagaMiddleware];
 
-  const composeEnhancers = (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
-    ? (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({
-        serialize: true,
-        maxAge: 300
-      }) || compose
-    : compose;
+ const store = configureStore({
+    reducer: createRootReducer(), // Ensure rootReducer is updated to use createSlice
+    middleware: (getDefaultMiddleware) => getDefaultMiddleware({
+      thunk: false
+    }).concat(sagaMiddleware),
+    preloadedState: loadStore(loadStoredState()), // This can replace your initialStore setup
+    devTools: {
+      serialize: false,
+      maxAge: 300,
+    }
+  });
+  
 
-  const initialStore = loadStore(loadStoredState()) || defaultState;
-
-  const enhancers = composeEnhancers(applyMiddleware(...middleware));
-
-  const createdStore = _createStore(createRootReducer(), initialStore as any, enhancers);
   sagaMiddleware.run(MainSaga);
 
-  createdStore.subscribe(
+  store.subscribe(
     throttle(() => {
-      saveState(createdStore.getState());
+      saveState(store.getState());
     }, 1000)
   );
 
-  return createdStore;
+  return store;
 }
 
 function loadStore(loadedStore: SavedState | undefined) {
