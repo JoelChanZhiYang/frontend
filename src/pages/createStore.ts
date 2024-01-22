@@ -1,4 +1,4 @@
-import { configureStore,  } from '@reduxjs/toolkit';
+import { configureStore } from '@reduxjs/toolkit';
 import { throttle } from 'lodash';
 import createSagaMiddleware from 'redux-saga';
 
@@ -8,25 +8,24 @@ import MainSaga from '../commons/sagas/MainSaga';
 import { generateOctokitInstance } from '../commons/utils/GitHubPersistenceHelper';
 import { loadStoredState, SavedState, saveState } from './localStorage';
 
-
 export const store = createStore();
 
 export function createStore() {
   const sagaMiddleware = createSagaMiddleware();
 
- const store = configureStore({
+  const store = configureStore({
     reducer: createRootReducer(), // Ensure rootReducer is updated to use createSlice
-    middleware: (getDefaultMiddleware) => getDefaultMiddleware({
-      serializableCheck: false,
-      thunk: false
-    }).concat(sagaMiddleware),
+    middleware: getDefaultMiddleware =>
+      getDefaultMiddleware({
+        serializableCheck: false,
+        thunk: false
+      }).concat(sagaMiddleware),
     preloadedState: loadStore(loadStoredState()), // This can replace your initialStore setup
     devTools: {
       serialize: false,
-      maxAge: 300,
+      maxAge: 300
     }
   });
-  
 
   sagaMiddleware.run(MainSaga);
 
