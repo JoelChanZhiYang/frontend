@@ -14,11 +14,11 @@ export function createStore() {
   const sagaMiddleware = createSagaMiddleware();
 
   const store = configureStore({
-    reducer: createRootReducer(), 
+    reducer: createRootReducer(),
     middleware: getDefaultMiddleware =>
       getDefaultMiddleware({
         // Should be true, but would require a massive rewrite
-        immutableCheck: false, 
+        immutableCheck: false,
         serializableCheck: false,
         thunk: false
       }).concat(sagaMiddleware),
