@@ -17,6 +17,7 @@ export function createStore() {
  const store = configureStore({
     reducer: createRootReducer(), // Ensure rootReducer is updated to use createSlice
     middleware: (getDefaultMiddleware) => getDefaultMiddleware({
+      serializableCheck: false,
       thunk: false
     }).concat(sagaMiddleware),
     preloadedState: loadStore(loadStoredState()), // This can replace your initialStore setup
