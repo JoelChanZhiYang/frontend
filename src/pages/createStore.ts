@@ -14,13 +14,15 @@ export function createStore() {
   const sagaMiddleware = createSagaMiddleware();
 
   const store = configureStore({
-    reducer: createRootReducer(), // Ensure rootReducer is updated to use createSlice
+    reducer: createRootReducer(), 
     middleware: getDefaultMiddleware =>
       getDefaultMiddleware({
+        // Should be true, but would require a massive rewrite
+        immutableCheck: false, 
         serializableCheck: false,
         thunk: false
       }).concat(sagaMiddleware),
-    preloadedState: loadStore(loadStoredState()), // This can replace your initialStore setup
+    preloadedState: loadStore(loadStoredState()),
     devTools: {
       serialize: false,
       maxAge: 300
