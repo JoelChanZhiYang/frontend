@@ -15,7 +15,7 @@ import { defineSymbol } from 'js-slang/dist/createContext';
 import { InterruptedError } from 'js-slang/dist/errors/errors';
 import { parse } from 'js-slang/dist/parser/parser';
 import { manualToggleDebugger } from 'js-slang/dist/stdlib/inspector';
-import { Chapter, Variant } from 'js-slang/dist/types';
+import { Chapter, SourceError, Variant } from 'js-slang/dist/types';
 import { random } from 'lodash';
 import Phaser from 'phaser';
 import { SagaIterator } from 'redux-saga';
@@ -1231,7 +1231,24 @@ export function* evalCode(
   ) {
     yield* dumpDisplayBuffer(workspaceLocation, isStoriesBlock, storyEnv);
     if (!isStoriesBlock) {
-      yield put(actions.evalInterpreterError(context.errors, workspaceLocation));
+      const specialError = checkSpecialError(context.errors);
+      if (specialError !== null) {
+        switch (specialError) {
+          case 'source_academy_interrupt': {
+            yield* handleSourceAcademyInterrupt(context, entrypointCode, workspaceLocation);
+            break;
+          }
+          // This should not happen but we check just in case
+          default: {
+            //@ts-expect-error This is for type safety to ensure that all cases are handled
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const _: never = specialError;
+            yield put(actions.evalInterpreterError(context.errors, workspaceLocation));
+          }
+        }
+      } else {
+        yield put(actions.evalInterpreterError(context.errors, workspaceLocation));
+      }
     } else {
       // Safe to use ! as storyEnv will be defined from above when we call from EVAL_STORY
       yield put(actions.evalStoryError(context.errors, storyEnv!));
@@ -1352,4 +1369,35 @@ export function* evalTestCode(
   if (type === TestcaseTypes.opaque) {
     yield put(actions.clearReplOutputLast(workspaceLocation));
   }
+}
+
+// Special module errors
+const specialErrors = ['source_academy_interrupt', 'ajbwj'] as const;
+type SpecialError = (typeof specialErrors)[number];
+
+function checkSpecialError(errors: SourceError[]): SpecialError | null {
+  if (errors.length !== 1) {
+    return null;
+  }
+  const firstError = errors[0] as any;
+  if (typeof firstError.error !== 'string') {
+    return null;
+  }
+  if (!specialErrors.includes(firstError.error)) {
+    return null;
+  }
+
+  return firstError.error as SpecialError;
+}
+
+function* handleSourceAcademyInterrupt(
+  context: Context,
+  entrypointCode: string,
+  workspaceLocation: WorkspaceLocation
+) {
+  yield put(
+    actions.evalInterpreterSuccess('Program has been interrupted by module', workspaceLocation)
+  );
+  context.errors = [];
+  yield put(actions.notifyProgramEvaluated(null, null, entrypointCode, context, workspaceLocation));
 }
