@@ -149,7 +149,11 @@ export function* evalCode(
         );
       })
       .then(
-        (returnedValue: any): Result => ({ status: 'finished', context, value: returnedValue }),
+        (returnedValue: any): Result => ({
+          status: 'finished',
+          context: wasmContext,
+          value: returnedValue
+        }),
         (e: any): Result => {
           console.log(e);
           return { status: 'error' };
