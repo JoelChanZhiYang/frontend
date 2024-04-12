@@ -90,7 +90,7 @@ class SideContentCseMachineBase extends React.Component<CseMachineProps, State> 
       height: this.calculateHeight(props.sideContentHeight),
       lastStep: false,
       stepLimitExceeded: false,
-      chapter: props.chapter
+      chapter: props.chapter,
     };
     if (this.isJava()) {
       JavaCseMachine.init(
@@ -232,53 +232,45 @@ class SideContentCseMachineBase extends React.Component<CseMachineProps, State> 
             onRelease={this.sliderRelease}
             value={this.state.value < 0 ? 0 : this.state.value}
           />
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: this.isJava() ? 'center' : 'space-between',
-              alignItems: 'center'
-            }}
-          >
-            {!this.isJava() && (
-              <ButtonGroup>
-                <Tooltip2 content="Control and Stash" compact>
-                  <AnchorButton
-                    onMouseUp={() => {
-                      if (this.state.visualization) {
-                        CseMachine.toggleControlStash();
-                        CseMachine.redraw();
-                      }
-                    }}
-                    icon="layers"
+          <div style={{ display: 'flex', justifyContent: this.isJava() ? 'center' : 'space-between', alignItems: 'center' }}>
+            {!this.isJava() && <ButtonGroup>
+              <Tooltip2 content="Control and Stash" compact>
+                <AnchorButton
+                  onMouseUp={() => {
+                    if (this.state.visualization) {
+                      CseMachine.toggleControlStash();
+                      CseMachine.redraw();
+                    }
+                  }}
+                  icon="layers"
+                  disabled={!this.state.visualization}
+                >
+                  <Checkbox
+                    checked={CseMachine.getControlStash()}
                     disabled={!this.state.visualization}
-                  >
-                    <Checkbox
-                      checked={CseMachine.getControlStash()}
-                      disabled={!this.state.visualization}
-                      style={{ margin: 0 }}
-                    />
-                  </AnchorButton>
-                </Tooltip2>
-                <Tooltip2 content="Truncate Control" compact>
-                  <AnchorButton
-                    onMouseUp={() => {
-                      if (this.state.visualization) {
-                        CseMachine.toggleStackTruncated();
-                        CseMachine.redraw();
-                      }
-                    }}
-                    icon="minimize"
+                    style={{ margin: 0 }}
+                  />
+                </AnchorButton>
+              </Tooltip2>
+              <Tooltip2 content="Truncate Control" compact>
+                <AnchorButton
+                  onMouseUp={() => {
+                    if (this.state.visualization) {
+                      CseMachine.toggleStackTruncated();
+                      CseMachine.redraw();
+                    }
+                  }}
+                  icon="minimize"
+                  disabled={!this.state.visualization}
+                >
+                  <Checkbox
+                    checked={CseMachine.getStackTruncated()}
                     disabled={!this.state.visualization}
-                  >
-                    <Checkbox
-                      checked={CseMachine.getStackTruncated()}
-                      disabled={!this.state.visualization}
-                      style={{ margin: 0 }}
-                    />
-                  </AnchorButton>
-                </Tooltip2>
-              </ButtonGroup>
-            )}
+                    style={{ margin: 0 }}
+                  />
+                </AnchorButton>
+              </Tooltip2>
+            </ButtonGroup>}
             <ButtonGroup>
               <Button
                 disabled={!this.state.visualization}
@@ -289,19 +281,13 @@ class SideContentCseMachineBase extends React.Component<CseMachineProps, State> 
                 disabled={!this.state.visualization}
                 icon="chevron-left"
                 onClick={
-                  this.isJava() || CseMachine.getControlStash()
-                    ? this.stepPrevious
-                    : this.stepPrevChangepoint
+                  this.isJava() || CseMachine.getControlStash() ? this.stepPrevious : this.stepPrevChangepoint
                 }
               />
               <Button
                 disabled={!this.state.visualization}
                 icon="chevron-right"
-                onClick={
-                  this.isJava() || CseMachine.getControlStash()
-                    ? this.stepNext
-                    : this.stepNextChangepoint
-                }
+                onClick={this.isJava() || CseMachine.getControlStash() ? this.stepNext : this.stepNextChangepoint}
               />
               <Button
                 disabled={!this.state.visualization}
@@ -309,35 +295,33 @@ class SideContentCseMachineBase extends React.Component<CseMachineProps, State> 
                 onClick={this.stepNextBreakpoint}
               />
             </ButtonGroup>
-            {!this.isJava() && (
-              <ButtonGroup>
-                <Tooltip2 content="Print" compact>
-                  <AnchorButton
-                    onMouseUp={() => {
-                      if (this.state.visualization) {
-                        CseMachine.togglePrintableMode();
-                        CseMachine.redraw();
-                      }
-                    }}
-                    icon="print"
+            {!this.isJava() && <ButtonGroup>
+              <Tooltip2 content="Print" compact>
+                <AnchorButton
+                  onMouseUp={() => {
+                    if (this.state.visualization) {
+                      CseMachine.togglePrintableMode();
+                      CseMachine.redraw();
+                    }
+                  }}
+                  icon="print"
+                  disabled={!this.state.visualization}
+                >
+                  <Checkbox
                     disabled={!this.state.visualization}
-                  >
-                    <Checkbox
-                      disabled={!this.state.visualization}
-                      checked={CseMachine.getPrintableMode()}
-                      style={{ margin: 0 }}
-                    />
-                  </AnchorButton>
-                </Tooltip2>
-                <Tooltip2 content="Save" compact>
-                  <AnchorButton
-                    icon="floppy-disk"
-                    disabled={!this.state.visualization}
-                    onClick={Layout.exportImage}
+                    checked={CseMachine.getPrintableMode()}
+                    style={{ margin: 0 }}
                   />
-                </Tooltip2>
-              </ButtonGroup>
-            )}
+                </AnchorButton>
+              </Tooltip2>
+              <Tooltip2 content="Save" compact>
+                <AnchorButton
+                  icon="floppy-disk"
+                  disabled={!this.state.visualization}
+                  onClick={Layout.exportImage}
+                />
+              </Tooltip2>
+            </ButtonGroup>}
           </div>
         </div>{' '}
         {this.state.visualization &&
@@ -369,34 +353,32 @@ class SideContentCseMachineBase extends React.Component<CseMachineProps, State> 
             className={Classes.RUNNING_TEXT}
             data-testid="cse-machine-default-text"
           >
-            {this.isJava() ? (
-              <span>
-                The CSEC machine generates control, stash, environment and class model diagrams
-                adapted from the notation introduced in{' '}
-                <a href={Links.textbookChapter3_2} rel="noopener noreferrer" target="_blank">
-                  <i>
-                    Structure and Interpretation of Computer Programs, JavaScript Edition, Chapter
-                    3, Section 2
-                  </i>
-                </a>
-                {'. '}
-                You have chosen the sublanguage{' '}
-                <a href={`${Links.sourceDocs}java_csec/`} rel="noopener noreferrer" target="_blank">
-                  <i>Java CSEC</i>
-                </a>
-              </span>
-            ) : (
-              <span>
-                The CSE machine generates control, stash and environment model diagrams following a
-                notation introduced in{' '}
-                <a href={Links.textbookChapter3_2} rel="noopener noreferrer" target="_blank">
-                  <i>
-                    Structure and Interpretation of Computer Programs, JavaScript Edition, Chapter
-                    3, Section 2
-                  </i>
-                </a>
-              </span>
-            )}
+            {this.isJava()
+            ? <span>
+              The CSEC machine generates control, stash, environment and class model diagrams adapted from the
+              notation introduced in{' '}
+              <a href={Links.textbookChapter3_2} rel="noopener noreferrer" target="_blank">
+                <i>
+                  Structure and Interpretation of Computer Programs, JavaScript Edition, Chapter 3,
+                  Section 2
+                </i>
+              </a>{'. '}
+
+              You have chosen the sublanguage{' '}
+              <a href={`${Links.sourceDocs}java_csec/`} rel="noopener noreferrer" target="_blank">
+                <i>Java CSEC</i>
+              </a>
+            </span>
+            : <span>
+              The CSE machine generates control, stash and environment model diagrams following a
+              notation introduced in{' '}
+              <a href={Links.textbookChapter3_2} rel="noopener noreferrer" target="_blank">
+                <i>
+                  Structure and Interpretation of Computer Programs, JavaScript Edition, Chapter 3,
+                  Section 2
+                </i>
+              </a>
+            </span>}
             .
             <br />
             <br /> On this tab, the REPL will be hidden from view, so do check that your code has no
@@ -449,7 +431,7 @@ class SideContentCseMachineBase extends React.Component<CseMachineProps, State> 
     } else {
       Layout.zoomStage(false, 5);
     }
-  };
+  }
 
   private sliderRelease = (newValue: number) => {
     if (newValue === this.props.stepsTotal) {
@@ -576,7 +558,7 @@ const mapStateToProps: MapStateToProps<StateProps, OwnProps, OverallState> = (
     changepointSteps: workspace.changepointSteps,
     needCseUpdate: workspace.updateCse,
     machineOutput: workspace.output,
-    chapter: workspace.context.chapter
+    chapter: workspace.context.chapter,
   };
 };
 
